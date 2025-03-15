@@ -35,7 +35,7 @@ def send_telegram_message(hook_url, chat_id, pdf_path, alert):
     caption = f"New Incident detected!\n{alert['rule']['description']}\nLevel {alert['rule']['level']}.\nAgent: {alert['agent']['name']} {alert['agent']['id']}"
     payload = {
         'chat_id': chat_id,
-        'caption': caption,
+        'text': caption,
         'parse_mode': 'HTML'
     }
     files = {
@@ -45,7 +45,7 @@ def send_telegram_message(hook_url, chat_id, pdf_path, alert):
     return r
 
 if __name__ == "__main__":
-    CHAT_ID = '-2601018092'
+    CHAT_ID = '-1002601018092'
 
     try:
         alert_file = sys.argv[1]
