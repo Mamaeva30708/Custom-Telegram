@@ -6,7 +6,7 @@ import traceback
 
 try:
     import requests
-    from weasyprint import HTML
+    # from weasyprint import HTML
     from jinja2 import Environment, FileSystemLoader
 except ImportError as e:
     with open('/var/ossec/logs/integrations.log', 'a') as f:
@@ -19,16 +19,16 @@ except Exception as e:
         f.write(f"Error: {traceback.format_exc()}\n")
 
 
-def generate_pdf(alert):
-    template = env.get_template("report.html")
-    try:
-        template = HTML(string=template.render(data=alert))
-    except Exception:
-        with open('/var/ossec/logs/integrations.log', 'a') as f:
-            f.write(f'\ntemplate error')
-        template = HTML(string=template.render(data=alert['data']))
-    template.write_pdf("/var/ossec/integrations/temp/report.pdf")
-    return "/var/ossec/integrations/temp/report.pdf"
+# def generate_pdf(alert):
+#     template = env.get_template("report.html")
+#     try:
+#         template = HTML(string=template.render(data=alert))
+#     except Exception:
+#         with open('/var/ossec/logs/integrations.log', 'a') as f:
+#             f.write(f'\ntemplate error')
+#         template = HTML(string=template.render(data=alert['data']))
+#     template.write_pdf("/var/ossec/integrations/temp/report.pdf")
+#     return "/var/ossec/integrations/temp/report.pdf"
 
 
 def send_telegram_message(hook_url, chat_id, pdf_path, alert):
@@ -38,10 +38,10 @@ def send_telegram_message(hook_url, chat_id, pdf_path, alert):
         'text': caption,
         'parse_mode': 'HTML'
     }
-    files = {
-        'document': open(pdf_path, 'rb')
-    }
-    r = requests.post(hook_url, data=payload, files=files, stream=True)
+    # files = {
+    #     'document': open(pdf_path, 'rb')
+    # }
+    r = requests.post(hook_url, json=payload, stream=True)
     return r
 
 if __name__ == "__main__":
@@ -61,8 +61,8 @@ if __name__ == "__main__":
         with open('/var/ossec/logs/integrations.log', 'a') as f:
             f.write(f'\n{str(alert_json)}')
 
-        pdf_path = generate_pdf(alert_json)
-        response = send_telegram_message(hook_url, CHAT_ID, pdf_path, alert_json)
+        # pdf_path = generate_pdf(alert_json)
+        response = send_telegram_message(hook_url, CHAT_ID, alert_json)
         if not response.ok:
             with open('/var/ossec/logs/integrations.log', 'a') as f:
                 f.write(f"Error response: {response.text}\n")
